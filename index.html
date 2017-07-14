@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" type="text/css" href="store.css">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+<div id="backgroundImage"></div>
+<h1>Welcome to Summer Internship</h1>
+<p>Please insert you first and last names to Post or to Update</p>
+<form>
+First name: <input id="fname" type="text">
+Last name: 	<input id="lname" type="text">
+ID:<input id="id" type="number" readonly>
+<button id="add">Add User</button>
+<button id="update">Update User</button>			
+</form>
+<p>Please insert ID to search among users</p>
+<form>
+ID: <input id="getbyid" type="text" name="id">
+</form>
+<button id="search">Find User by ID</button>
+<button id="delete">Remove User</button>
+<p>Please click on 'Show All' to see all users</p>
+<button id="showall">Show All Users</button>
+<ul id='unli'></ul>
+<script>
+$('#add').on('click', function(){
+	const fname= $('#fname').val(),
+	lname = $('#lname').val();
+	if (fname==="" || lname==="")
+		alert("Empty input");
+	else{
+	$.ajax({
+		url			: 	'/users',
+		type      	: 	'post',
+		data        : 	JSON.stringify({ firstName: fname, lastName:lname}),
+		contentType : 	"application/json",
+		success     : 	function(data) {
+							myData=JSON.parse(data)
+								alert('User ID   ' + myData.__id);
+						},
+		error       : 	function() {
+    						alert('Error adding data');
+						}
+	});	
+	}
+});
+$('#search').on('click', function(){
+	const id = $('#getbyid').val();
+	$.ajax({
+		url			:   "/users/" + id,
+		type      	:   'GET',
+		contentType :   "application/json",
+		success     : 	function(data) {
+							const mdata= JSON.parse(data);
+							alert('found a user'); 
+							$('#id').val(mdata.__id);
+							$('#fname').val(mdata.firstName);
+							$('#lname').val(mdata.lastName);
+						},
+		error       : 	function() {
+							alert('Error finding user');
+						}
+	});
+});
+$('#showall').on('click', function(){
+	$.ajax({
+		url			:   "/users",
+		type      	:   'get',
+		contentType :   "application/json",
+		success     : 	function(data) {
+							const mdata= JSON.parse(data);
+							alert('List of user');
+							const keys= Object.keys(mdata);
+							$('#unli').empty();
+							keys.forEach(function(elem){
+								const idList= $('<li>ID: '+mdata[elem].__id+'</li>');
+								const fnameList= $('<li id="fn">First Name: '+mdata[elem].firstName+'</li>');
+								const lnameList= $('<li id="ln">Last Name: '+mdata[elem].lastName+'</li>');
+								$('#unli').append(idList);
+								$('#unli').append(fnameList);
+								$('#unli').append(lnameList);
+								$('#unli').append('<br>');
+							});	
+						},
+		error       : 	function() {
+							alert('Error finding user');
+						}
+	});
+});
+$('#delete').on('click', function(){
+	const id = $('#getbyid').val();
+	$.ajax({
+		url			:   "/users/" + id,
+		type      	: 	'delete',
+		contentType :   "application/json",
+		success     :   function() {
+							alert('User deleted');
+							$('#unli').empty();								
+						},
+		error       : 	function() {
+							alert('Error deleting user');
+						}
+	});
+});						
+$('#update').on('click', function(){
+	const id = $('#id').val(),
+	fname= $('#fname').val(),
+	lname = $('#lname').val();
+	$.ajax({
+		url			:   "/users",
+		type      	: 	'put',
+		data        : 	JSON.stringify({ __id : id, firstName: fname, lastName:lname}),
+		contentType : 	"application/json",
+		success     : 	function() {
+							alert('Data updated');										
+						},
+		error       : 	function() {
+							alert('Error updating data');
+						}
+	});
+});
+</script>
+</body>
+</html>
