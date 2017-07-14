@@ -1,7 +1,7 @@
 # server-store
 Download files in one folder
 
-Open Git Bash, Command Prompt(cmd) or any other command-line interface 
+Open Git Bash, Command Prompt(cmd) or any other command-line interface
 Install node.js
 From bash go the folder where files are placed
 Type "node fserver.js"
